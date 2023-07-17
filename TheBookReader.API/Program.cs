@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Inject Service with Transient Instance
 // Reference Domain Logic
 builder.Services.AddTransient<IBookReaderService, BookReaderService>();
 

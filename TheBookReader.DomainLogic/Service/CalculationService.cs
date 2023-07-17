@@ -24,6 +24,7 @@
                 .Replace("`", string.Empty)
                 .Replace("~", string.Empty)
                 .Replace("/", string.Empty)
+                .Replace("\r\n", string.Empty)
                 .Replace("\"", string.Empty);
 
             // Excluding hyphen words
@@ -37,7 +38,7 @@
             RemoveBadCharacters();
 
             // Split Sentences on spaces
-            var contentWords = _content.Split(' ');
+            var contentWords = _content.Split(new char[0]);
 
             // Ensure we have atleast one word
             if (contentWords.Length > 0)
@@ -51,11 +52,15 @@
                 // Might be a better and way of counting these words, but distinct and then do count
                 foreach (var word in contentWords.Select(wrd => wrd.ToLower().Trim()).Distinct())
                 {
-                    usageDictionary.Add(
-                        word, 
-                        contentWords.Where(wordSearch => 
-                                                wordSearch.ToLower().Equals(word, StringComparison.CurrentCultureIgnoreCase))
-                        .Count());
+                    var count = contentWords.Where(wordSearch =>
+                                                wordSearch.ToLower().Equals(word, StringComparison.CurrentCultureIgnoreCase)).Count();
+                    var nthValue = usageDictionary.Count() > SelectTopRows
+                                    ? usageDictionary.OrderByDescending(x => x.Value).ElementAt(SelectTopRows)
+                                    : new KeyValuePair<string, int>("None", 0);
+                    if (count > nthValue.Value)
+                    {
+                        usageDictionary.Add(word, count);
+                    }
                 }
             }
             

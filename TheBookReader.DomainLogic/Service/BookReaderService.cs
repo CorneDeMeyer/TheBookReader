@@ -26,7 +26,9 @@ namespace TheBookReader.DomainLogic.Service
             var timer = new Stopwatch();
             timer.Start();
 
-            var content = await GetAllPdfContent(file);
+            var content = file.FileName.Contains(".pdf") 
+                ? await GetAllPdfContent(file)
+                : await GetAllTextContent(file);
             if (!string.IsNullOrEmpty(content.Key) && content.Value > 0)
             {
                 var wordCounts = new CalculationService(content.Key).CalculateWordUsage(filter.MinLength, filter.TopRecords);
@@ -83,6 +85,35 @@ namespace TheBookReader.DomainLogic.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error reading book content in file: {file.Name}.");
+                content = ex.Message;
+                noPages = -1;
+            }
+
+            // Return data relevant to the pdf
+            return new KeyValuePair<string, int>(content, noPages);
+        }
+
+        private async Task<KeyValuePair<string, int>> GetAllTextContent(IFormFile file)
+        {
+            var content = string.Empty;
+            var noPages = 1;
+
+            try
+            {
+                using (var fileStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(fileStream);
+                    fileStream.Position = 0;
+                    using (var sr = new StreamReader(fileStream))
+                    {
+                        // Read the stream as a string, and write the string to the console.
+                        content = sr.ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error reading file content in file: {file.Name}.");
                 content = ex.Message;
                 noPages = -1;
             }

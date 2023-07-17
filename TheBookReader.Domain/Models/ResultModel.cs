@@ -1,5 +1,6 @@
 ﻿namespace TheBookReader.Domain.Models
 {
+    // Generic Result Model that uses Generics
     public class ResultModel<IFilterBase, IResult> where IFilterBase : SearchFilterBase
     {
         public string? BookTitle { get; set; }

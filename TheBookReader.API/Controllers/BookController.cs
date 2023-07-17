@@ -34,7 +34,7 @@ namespace TheBookReader.API.Controllers
             {
                 return BadRequest("Please specify Minimum Word length to count.");
             }
-            else if (!file.ContentType.Equals("application/pdf"))
+            else if (!file.ContentType.Equals("application/pdf") && !file.ContentType.Equals("text/plain"))
             {
                 return BadRequest("Only PDF documents type accepted.");
             }
