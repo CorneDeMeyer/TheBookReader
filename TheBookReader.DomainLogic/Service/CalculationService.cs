@@ -50,16 +50,21 @@
                 }
 
                 // Might be a better and way of counting these words, but distinct and then do count
-                foreach (var word in contentWords.Select(wrd => wrd.ToLower().Trim()).Distinct())
+                foreach (var searchTerm in contentWords.Select(wrd => wrd.ToLower().Trim()).Distinct())
                 {
-                    var count = contentWords.Where(wordSearch =>
-                                                wordSearch.ToLower().Equals(word, StringComparison.CurrentCultureIgnoreCase)).Count();
-                    var nthValue = usageDictionary.Count() > SelectTopRows
+                    // Create the query.  Use the InvariantCultureIgnoreCase comparision to match "data" and "Data"
+                    var matchQuery = from word in contentWords
+                                     where word.Equals(searchTerm, StringComparison.InvariantCultureIgnoreCase)
+                                     select word;
+
+                    // Count the matches, which executes the query.  
+                    var wordCount = matchQuery.Count();
+                    var nthValue = usageDictionary.Count() >= SelectTopRows
                                     ? usageDictionary.OrderByDescending(x => x.Value).ElementAt(SelectTopRows)
                                     : new KeyValuePair<string, int>("None", 0);
-                    if (count > nthValue.Value)
+                    if (wordCount > nthValue.Value)
                     {
-                        usageDictionary.Add(word, count);
+                        usageDictionary.Add(searchTerm, wordCount);
                     }
                 }
             }
