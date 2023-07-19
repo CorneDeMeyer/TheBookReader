@@ -24,9 +24,9 @@
                 .Replace("`", string.Empty)
                 .Replace("~", string.Empty)
                 .Replace("/", string.Empty)
+                .Replace(Environment.NewLine, string.Empty)
                 .Replace("\r\n", string.Empty)
                 .Replace("\"", string.Empty);
-
             // Excluding hyphen words
 
             return this; 
